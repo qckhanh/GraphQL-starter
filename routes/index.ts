@@ -2,6 +2,7 @@ import { Express, Response, Request, NextFunction } from 'express';
 import errorMiddleware from '../middleware/error.middlewares';
 import { HttpError } from '../helpers/httpsError.helpers';
 import customerRoute from './customer';
+import graphQLRouter from '../graphql/graphRouter';
 /**
  * Apply Routes
  *
@@ -11,19 +12,19 @@ import customerRoute from './customer';
  * @param {Express} app - The Express application instance
  */
 const applyRoutes = (app: Express) => {
-  app.use('/api/v1/customers', customerRoute);
-  // Add other routes here
-
-  //Invalid route
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    throw new HttpError(
-      `Route ${req.method} ${req.originalUrl} does not exist`,
-      404,
-      'ROUTE_NOT_FOUND',
-    );
-  });
-  // Error handling middleware
-  app.use(errorMiddleware);
+    app.use('/api/v1/customers', customerRoute);
+    // Add other routes here
+    app.use(graphQLRouter);
+    //Invalid route
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        throw new HttpError(
+            `Route ${req.method} ${req.originalUrl} does not exist`,
+            404,
+            'ROUTE_NOT_FOUND',
+        );
+    });
+    // Error handling middleware
+    app.use(errorMiddleware);
 };
 
 export default applyRoutes;
