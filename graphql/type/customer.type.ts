@@ -21,7 +21,7 @@ export const CustomerType = new GraphQLObjectType({
         },
         orders: {
             type: new GraphQLList(OrderType),
-            resovle: (parent: any) => {
+            resolve: (parent: any) => {
                 return Database.orders.filter(order => {
                     return order.customer_id === parent.id;
                 });
