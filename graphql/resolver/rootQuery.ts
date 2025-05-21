@@ -3,18 +3,36 @@ import {
     GraphQLInt,
     GraphQLList,
     GraphQLObjectType,
+    GraphQLString,
 } from 'graphql/type';
 import { CustomerType } from '../type/customer.type';
 import { Database } from '../../database/database';
 import customer from '../../routes/customer';
+import { ProductType } from '../type/product.type';
 
 export const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: () => ({
         customers: {
             type: new GraphQLList(CustomerType),
-            resolve: () => Database.customers,
+            args: {
+                name: {
+                    type: GraphQLString,
+                },
+            },
+            resolve: (parent: any, args: any) => {
+                if (args.name === '*' || !args.name) args.name = '';
+                const result = Database.customers.filter(customer =>
+                    customer.name.includes(args.name),
+                );
+
+                if (result.length === 0) {
+                    return [];
+                }
+                return result;
+            },
         },
+
         customer: {
             type: CustomerType,
             args: {
@@ -26,6 +44,12 @@ export const RootQuery = new GraphQLObjectType({
                 return Database.customers.find(customer => {
                     return customer.id === args.id;
                 });
+            },
+        },
+        products: {
+            type: new GraphQLList(ProductType),
+            resolve: (parent: any, args: any) => {
+                return Database.products;
             },
         },
         customerTotal: {
